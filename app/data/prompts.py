@@ -218,6 +218,8 @@ class Prompts:
             "empathetic": cls.empathetic
         }
 
-        if mood in prompts:
-            return cls.prompt_helper.format(length=length) + prompts[mood]
-        return "気分が認識できません" 
+        if mood not in prompts:
+            valid_moods = list(prompts.keys())
+            raise ValueError(f"Invalid mood value. Must be one of: {valid_moods}")
+            
+        return cls.prompt_helper.format(length=length) + prompts[mood] 
