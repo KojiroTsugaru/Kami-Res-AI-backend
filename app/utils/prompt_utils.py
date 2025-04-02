@@ -1,33 +1,24 @@
 from app.data.prompts import Prompts
 
 def process_parameters(parameters):
-    mood = parameters.get('mood', '')
-    length = parameters.get('length', '')
-    prompt = generate_prompt(mood, length)
-
-    result = {
-        "prompt": prompt,
-        "status": "success"
-    }
-    
-    return result
-
-def generate_prompt(mood, length):
-    convertedLength = convertLength(length)
-    prompt_helper = Prompts.prompt_helper.format(length=convertedLength)
-
-    prompts = {
-        "casual": Prompts.casual,
-        "humorous": Prompts.humorous,
-        "cool": Prompts.cool
-    }
-
-    if mood in prompts:
-        prompt = prompt_helper + prompts[mood]
-    else:
-        prompt = "気分が認識できません"
-    
-    return prompt
+    try:
+        mood = parameters.get('mood', '')
+        length = parameters.get('length', '')
+        
+        if not mood or not length:
+            raise ValueError("Missing required parameters: mood and length")
+            
+        converted_length = convertLength(length)
+        prompt = Prompts.get_prompt(mood, converted_length)
+        
+        return {
+            "prompt": prompt
+        }
+        
+    except ValueError as e:
+        raise ValueError(str(e))
+    except Exception as e:
+        raise Exception("Error processing parameters")
 
 def convertLength(length):
     if length == 1.0:
