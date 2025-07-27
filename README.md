@@ -28,49 +28,8 @@ Kami-Res-AI Backend is a RESTful API service that processes images and generates
 
 ### Base URL
 ```
-https://your-railway-app.railway.app/api/v1
+https://kami-res-ai-backend-production.up.railway.app/api/v1
 ```
-
-### Endpoints
-
-#### POST `/generate-response`
-Generates an AI response based on an image and configuration.
-
-**Request Body:**
-```json
-{
-  "mood": "casual",
-  "length": 1.0,
-  "image_base64": "base64_encoded_image_data"
-}
-```
-
-**Parameters:**
-- `mood` (string, required): Response tone - `casual`, `humorous`, `cool`, `romantic`, `formal`, `empathetic`
-- `length` (float, required): Response length - `1.0` (short), `2.0` (medium), `3.0` (long)
-- `image_base64` (string, required): Base64-encoded image data
-
-**Response:**
-```json
-{
-  "status": "success",
-  "data": {
-    "choices": [
-      {
-        "message": {
-          "content": "Generated response text..."
-        }
-      }
-    ]
-  },
-  "code": 200
-}
-```
-
-**Error Responses:**
-- `400`: Invalid parameters (mood, length)
-- `422`: Missing required fields
-- `500`: Server error (API key issues, OpenAI errors)
 
 ## 🚀 Quick Start
 
@@ -122,27 +81,6 @@ pytest -v
 Run with coverage:
 ```bash
 pytest --cov=app -v
-```
-
-## 🏗️ Project Structure
-
-```
-kami-res-ai-backend/
-├── app/
-│   ├── api/
-│   │   ├── routes.py          # API endpoints
-│   │   └── schemas.py         # Pydantic models
-│   ├── data/
-│   │   └── prompts.py         # Prompt templates
-│   ├── utils/
-│   │   ├── openai_service.py  # OpenAI API integration
-│   │   └── prompt_service.py  # Prompt processing
-│   └── main.py               # FastAPI application
-├── tests/
-│   └── test_api.py           # API tests
-├── requirements.txt          # Python dependencies
-├── nixpacks.toml            # Railway deployment config
-└── README.md                # This file
 ```
 
 ## 🚀 Deployment
