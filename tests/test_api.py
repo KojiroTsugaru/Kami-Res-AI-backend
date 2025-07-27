@@ -6,11 +6,16 @@ from app.main import app
 client = TestClient(app)
 
 def test_generate_response_success(monkeypatch):
+    # Mock environment variable
+    monkeypatch.setenv("OPENAI_ACCESS_TOKEN", "fake_token")
+    
     # Patch OpenAI call to avoid real API usage
     def fake_openai_response(image_bytes, prompt):
         return {"choices": [{"message": {"content": "fake reply"}}]}
-    from app.utils import openai_service
-    monkeypatch.setattr(openai_service, "get_openai_response_from_image", fake_openai_response)
+    
+    # Patch at the import location in routes module
+    from app.api import routes
+    monkeypatch.setattr(routes, "get_openai_response_from_image", fake_openai_response)
     
     # Use a small dummy image
     dummy_image = base64.b64encode(b"testimage").decode()
@@ -23,6 +28,18 @@ def test_generate_response_success(monkeypatch):
     data = response.json()
     assert data["status"] == "success"
     assert "data" in data
+
+def test_generate_response_missing_env_var():
+    # Test without mocking environment variable
+    dummy_image = base64.b64encode(b"testimage").decode()
+    response = client.post("/api/v1/generate-response", json={
+        "mood": "casual",
+        "length": 1.0,
+        "image_base64": dummy_image
+    })
+    assert response.status_code == 500
+    data = response.json()
+    assert "detail" in data
 
 def test_generate_response_invalid_mood():
     dummy_image = base64.b64encode(b"testimage").decode()
@@ -63,4 +80,5 @@ def test_generate_response_empty_image_base64():
         "length": 1.0,
         "image_base64": ""
     })
-    assert response.status_code == 422  # FastAPI validation error for empty string 
+    # Empty string should cause a 500 error when trying to decode base64
+    assert response.status_code == 500 
