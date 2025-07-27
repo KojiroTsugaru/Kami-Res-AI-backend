@@ -1,76 +1,28 @@
-from flask import jsonify, request
-from app.api import api_bp
-from app.utils.prompt_utils import process_parameters
+from fastapi import APIRouter, HTTPException
+from app.api.schemas import PromptRequest, PromptResponse
+from app.utils.prompt_service import process_parameters
+from app.utils.openai_service import get_openai_response_from_image
+import base64
 
-@api_bp.route('/prompt', methods=['GET', 'POST'])
-def handle_request():
-    if request.method == 'GET':
-        return jsonify({
-            "status": "error",
-            "message": "Method Not Allowed",
-            "code": 405,
-            "example": {
-                "mood": "casual/humorous/cool/romantic/formal/empathetic",
-                "length": 1.0,
-                "description": "length: 1.0 (15文字以内), 2.0 (20-50文字), 3.0 (50文字以上)"
-            }
-        }), 405
+router = APIRouter()
 
+@router.post("/generate-response", response_model=PromptResponse)
+async def generate_response(request: PromptRequest):
     try:
-        parameters = request.get_json()
-        if not parameters:
-            return jsonify({
-                "status": "error",
-                "message": "No JSON data provided",
-                "code": 400,
-                "example": {
-                    "mood": "casual/humorous/cool/romantic/formal/empathetic",
-                    "length": 1.0,
-                    "description": "length: 1.0 (15文字以内), 2.0 (20-50文字), 3.0 (50文字以上)"
-                }
-            }), 400
+        # Generate prompt text
+        response = process_parameters({"mood": request.mood, "length": request.length})
+        prompt = response["prompt"]
         
-        response = process_parameters(parameters)
-        return jsonify({
+        # Decode base64 image and call OpenAI API
+        image_bytes = base64.b64decode(request.image_base64)
+        openai_response = get_openai_response_from_image(image_bytes, prompt)
+        
+        return {
             "status": "success",
-            "data": response,
+            "data": openai_response,
             "code": 200
-        }), 200
-        
-    except ValueError as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e),
-            "code": 400,
-            "example": {
-                "mood": "casual/humorous/cool/romantic/formal/empathetic",
-                "length": 1.0,
-                "description": "length: 1.0 (15文字以内), 2.0 (20-50文字), 3.0 (50文字以上)"
-            }
-        }), 400
-        
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e),
-            "code": 500,
-            "example": {
-                "mood": "casual/humorous/cool/romantic/formal/empathetic",
-                "length": 1.0,
-                "description": "length: 1.0 (15文字以内), 2.0 (20-50文字), 3.0 (50文字以上)"
-            }
-        }), 500
-
-# エラーハンドリングの追加
-@api_bp.errorhandler(405)
-def method_not_allowed(e):
-    return jsonify({
-        "status": "error",
-        "message": "Method Not Allowed",
-        "code": 405,
-        "example": {
-            "mood": "casual/humorous/cool/romantic/formal/empathetic",
-            "length": 1.0,
-            "description": "length: 1.0 (15文字以内), 2.0 (20-50文字), 3.0 (50文字以上)"
         }
-    }), 405
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) 

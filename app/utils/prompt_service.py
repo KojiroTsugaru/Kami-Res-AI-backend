@@ -1,4 +1,20 @@
-from app.data.prompts import Prompts
+from app.data.prompts import casual, humorous, cool, romantic, formal, empathetic, prompt_helper
+
+def get_prompt(mood, length):
+    prompts = {
+        "casual": casual,
+        "humorous": humorous,
+        "cool": cool,
+        "romantic": romantic,
+        "formal": formal,
+        "empathetic": empathetic
+    }
+
+    if mood not in prompts:
+        valid_moods = list(prompts.keys())
+        raise ValueError(f"Invalid mood value. Must be one of: {valid_moods}")
+        
+    return prompt_helper.format(length=length) + prompts[mood] 
 
 def process_parameters(parameters):
     try:
@@ -12,7 +28,7 @@ def process_parameters(parameters):
             raise ValueError("Length must be a number")
             
         converted_length = convertLength(length)
-        prompt = Prompts.get_prompt(mood, converted_length)
+        prompt = get_prompt(mood, converted_length)
         
         return {
             "prompt": prompt
