@@ -1,10 +1,10 @@
-# Kami-Res-AI Backend API
+# Flair Backend API
 
 A FastAPI-powered backend service for an AI-powered image analysis and response generation application. This project demonstrates modern backend development practices, API design, and integration with OpenAI's vision models.
 
 ## 🚀 Project Overview
 
-Kami-Res-AI Backend is a RESTful API service that processes images and generates contextual responses based on user-defined moods and length preferences. It integrates with OpenAI's GPT-4 Vision model to analyze images and generate appropriate text responses.
+Flair Backend is a RESTful API service that processes images and generates contextual responses based on user-defined moods and length preferences. It integrates with OpenAI's GPT-4 Vision model to analyze images and generate appropriate text responses.
 
 ## 🛠️ Tech Stack
 
@@ -42,7 +42,7 @@ https://kami-res-ai-backend-production.up.railway.app/api/v1
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd kami-res-ai-backend
+   cd flair-backend
    ```
 
 2. **Set up virtual environment**
