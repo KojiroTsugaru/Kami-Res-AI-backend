@@ -28,7 +28,7 @@ Flair Backend is a RESTful API service that processes images and generates conte
 
 ### Base URL
 ```
-https://kami-res-ai-backend-production.up.railway.app/api/v1
+https://flair-backend-prod.up.railway.app/api/v1
 ```
 
 ## 🚀 Quick Start
